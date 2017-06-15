@@ -1,8 +1,10 @@
 # sinatra-unicorn
 Sinatra * Unicorn * Capistrano
 
-Port 58080 is pure sinatra
-Port 58081 is unicorn sinatra
+- Port 58080
+  - pure sinatra
+- Port 58081
+  - unicorn sinatra
 
 ## Installation
 
