@@ -1,0 +1,43 @@
+networks: {}
+version: '3'
+
+services:
+  sinatra:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./:/app/build
+    command: ruby app.rb thin -o 0.0.0.0
+
+  unicorn:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./docker/app/sshd_config:/etc/ssh/sshd_config
+      - ~/.ssh/authorized_keys:/home/app/.ssh/authorized_keys
+      - ~/.ssh/id_rsa:/home/app/.ssh/id_rsa
+    command: /usr/sbin/sshd -D
+
+  nginx:
+    image: nginx:1.13.0-alpine
+    links:
+      - sinatra:sinatra
+      - unicorn:unicorn
+    volumes:
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    ports:
+      - "58080:8080"
+      - "58081:8081"
+
+  deploy:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./:/app/build
+      - ~/.ssh/id_rsa:/home/app/.ssh/id_rsa
+    links:
+      - unicorn:unicorn
+    user: app
