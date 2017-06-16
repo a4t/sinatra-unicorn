@@ -11,10 +11,11 @@ pid "#{app_path}/shared/tmp/pids/unicorn.pid"
 stderr_path "#{app_path}/shared/log/unicorn.stderr.log"
 stdout_path "#{app_path}/shared/log/unicorn.stdout.log"
 
+before_exec do |server|
+  ENV['BUNDLE_GEMFILE'] = File.expand_path('../Gemfile', File.dirname(__FILE__))
+end
 
 before_fork do |server, worker|
-  ENV['BUNDLE_GEMFILE'] = File.expand_path('Gemfile', "#{app_path}/current")
-
   old_pid = "#{server.config[:pid]}.oldbin"
   if File.exists?(old_pid) && server.pid != old_pid
     begin
